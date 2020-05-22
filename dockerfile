@@ -1,5 +1,6 @@
 ARG CERTIFICATE_PASSWORD="Test|234"
 ARG CONFIGURATION="Release"
+ARG ENVIRONMENT="Development"
 ARG PROJECT_NAME="Apis"
 
 ############################
@@ -58,13 +59,15 @@ RUN openssl pkcs12 \
 # for running the compiled code #
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
 ARG CERTIFICATE_PASSWORD
+ARG ENVIRONMENT
 ARG PROJECT_NAME
 COPY --from=build /dist /app
 WORKDIR /app
 
-ENV ASPNETCORE_Kestrel__Certificates__Default__Password="${CERTIFICATE_PASSWORD}"
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=${CERTIFICATE_PASSWORD}
 ENV ASPNETCORE_Kestrel__Certificates__Default__Path=localhost.pfx
 ENV ASPNETCORE_URLS=https://+:443
+ENV ASPNETCORE_ENVIRONMENT=${Environment}
 EXPOSE 443
 # https://github.com/moby/moby/issues/18492
 # https://stackoverflow.com/questions/40902445/using-variable-interpolation-in-string-in-docker/#40903689
